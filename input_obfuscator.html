@@ -12,6 +12,9 @@
             height: 100vh;
             margin: 0;
             padding: 0;
+            background: #4a69bd;
+            background: -webkit-linear-gradient(to right, #8e44ad, #4a69bd);
+            background: linear-gradient(to right, #8e44ad, #4a69bd);
         }
         #obfuscateForm {
             display: flex;
@@ -20,33 +23,60 @@
             justify-content: center;
             width: 33%; /* Takes up 1/3 of the page */
             min-width: 300px; /* Minimum width to ensure usability on small screens */
-            height: 100%;
+            height: auto;
             box-sizing: border-box;
             padding: 20px;
-            border: 1px solid #ccc;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0px 14px 28px rgba(0,0,0,0.25), 0px 10px 10px rgba(0,0,0,0.22);
+        }
+        #obfuscateForm h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
         }
         #obfuscateForm input, button {
             width: 100%;
             margin-bottom: 10px;
             padding: 10px;
             font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0px 14px 28px rgba(0,0,0,0.25), 0px 10px 10px rgba(0,0,0,0.22);
         }
         button {
             cursor: pointer;
-            background-color: #4CAF50;
+            background-color: #8e44ad;
             color: white;
             border: none;
         }
         button:hover {
-            background-color: white; 
-            color: black; 
-            border: 2px solid #4CAF50;
+            background-color: #4a69bd;
+            color: white; 
+        }
+		#outputWrapper {
+            position: relative; /* This allows the #copyNotification to be positioned relative to the wrapper */
+            width: 100%;
         }
         #obfuscatedText {
-            border: 1px solid #ccc;
+            border: none;
             padding: 10px;
             width: 100%;
             min-height: 50px;
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            border-radius: 5px;
+            box-shadow: 0px 14px 28px rgba(0,0,0,0.25), 0px 10px 10px rgba(0,0,0,0.22);
+        }
+		#copyNotification {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 10px;
+            background: white;
+            border: 1px solid #2c3e50;
+            border-radius: 5px;
+            box-shadow: 0px 14px 28px rgba(0,0,0,0.25), 0px 10px 10px rgba(0,0,0,0.22);
         }
     </style>
     <script>
@@ -103,13 +133,28 @@
             }
             document.getElementById("obfuscatedText").innerText = obfuscatedText;
         }
+		function copyToClipboard(event) {
+            let obfuscatedText = document.getElementById('obfuscatedText');
+            navigator.clipboard.writeText(obfuscatedText.innerText).then(function() {
+                /* clipboard successfully set */
+                var copyNotification = document.getElementById('copyNotification');
+                copyNotification.style.display = 'block';
+                setTimeout(function() {
+                    copyNotification.style.display = 'none';
+                }, 2000);  // The notification disappears after 2 seconds
+            }, function() {
+                /* clipboard write failed */
+            });
+        }
     </script>
 </head>
 <body>
     <form id="obfuscateForm" onsubmit="obfuscate(event)">
-        <input type="text" id="textToObfuscate" placeholder="Enter text to obfuscate">
+        <h2>Text Obfuscator</h2>
+        <input type="text" id="textToObfuscate" placeholder="Enter text to obfuscate" autocomplete="off">
         <button type="submit">Obfuscate</button>
-        <div id="obfuscatedText"></div>
+        <div id="obfuscatedText" onclick="copyToClipboard(event)"></div>
+        <div id="copyNotification">Copied to clipboard!</div>
     </form>
 </body>
 </html>
