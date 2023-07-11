@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Obfuscator</title>
+	<style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        #obfuscateForm {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 33%; /* Takes up 1/3 of the page */
+            min-width: 300px; /* Minimum width to ensure usability on small screens */
+            height: 100%;
+            box-sizing: border-box;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+        #obfuscateForm input, button {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 1em;
+        }
+        button {
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: white; 
+            color: black; 
+            border: 2px solid #4CAF50;
+        }
+        #obfuscatedText {
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 100%;
+            min-height: 50px;
+        }
+    </style>
+    <script>
+        var style_mapping = {
+			"a": ["𝒶", "𝑎", "𝙖", "𝖺", "𝚊", "𝕒", "𝗮", "🅰", "4", "@"],
+			"b": ["𝒷", "𝑏", "𝙗", "𝖻", "𝚋", "𝕓", "𝗯", "🅱"],
+			"c": ["𝒸", "𝑐", "𝙘", "𝖼", "𝚌", "𝕔", "𝗰", "🅲"],
+			"d": ["𝒹", "𝑑", "𝙙", "𝖽", "𝚍", "𝕕", "𝗱", "🅳"],
+			"e": ["ℯ", "𝑒", "𝙚", "𝖾", "𝚎", "𝕖", "𝗲", "🅴", "3", "€"],
+			"f": ["𝒻", "𝑓", "𝙛", "𝖿", "𝚏", "𝕗", "𝗳", "🅵"],
+			"g": ["𝓰", "𝑔", "𝙜", "𝗀", "𝚐", "𝕘", "𝗴", "🅶"],
+			"h": ["𝒽", "𝒉", "𝙝", "𝗁", "𝚑", "𝕙", "𝗵", "🅷"],
+			"i": ["𝒾", "𝒊", "𝙞", "𝗂", "𝚒", "𝕚", "𝗶", "🅸", "1", "|"],
+			"j": ["𝒿", "𝒋", "𝙟", "𝗃", "𝚓", "𝕛", "𝗷", "🅹"],
+			"k": ["𝓀", "𝒌", "𝙠", "𝗄", "𝚔", "𝕜", "𝗸", "🅺"],
+			"l": ["𝓁", "𝑙", "𝙡", "𝗅", "𝚕", "𝕝", "𝗹", "🅻"],
+			"m": ["𝓂", "𝑚", "𝙢", "𝗆", "𝚖", "𝕞", "𝗺", "🅼"],
+			"n": ["𝓃", "𝑛", "𝙣", "𝗇", "𝚗", "𝕟", "𝗻", "🅽"],
+			"o": ["ℴ", "𝑜", "𝙤", "𝗈", "𝚘", "𝕠", "𝗼", "🅾", "0", "ø"],
+			"p": ["𝓅", "𝑝", "𝙥", "𝗉", "𝚙", "𝕡", "𝗽", "🅿"],
+			"q": ["𝓆", "𝑞", "𝙦", "𝗊", "𝚚", "𝕢", "𝗾", "🆀"],
+			"r": ["𝓇", "𝑟", "𝙧", "𝗋", "𝚛", "𝕣", "𝗿", "🆁"],
+			"s": ["𝓈", "𝑠", "𝙨", "𝗌", "𝚜", "𝕤", "𝘀", "🆂", "5", "$"],
+			"t": ["𝓉", "𝑡", "𝙩", "𝗍", "𝚝", "𝕥", "𝘁", "🆃"],
+			"u": ["𝓊", "𝑢", "𝙪", "𝗎", "𝚞", "𝕦", "𝘂", "🆄"],
+			"v": ["𝓋", "𝑣", "𝙫", "𝗏", "𝚟", "𝕧", "𝘃", "🆅"],
+			"w": ["𝓌", "𝑤", "𝙬", "𝗐", "𝚠", "𝕨", "𝘄", "🆆"],
+			"x": ["𝓍", "𝑥", "𝙭", "𝗑", "𝚡", "𝕩", "𝘅", "🆇"],
+			"y": ["𝓎", "𝑦", "𝙮", "𝗒", "𝚢", "𝕪", "𝘆", "🆈"],
+			"z": ["𝓏", "𝑧", "𝙯", "𝗓", "𝚣", "𝕫", "𝘇", "🆉"],
+			"0": ["⓪", "𝟎", "𝟘", "𝟢", "𝟬", "𝟶"],
+			"1": ["①", "𝟏", "𝟙", "𝟣", "𝟭", "𝟷"],
+			"2": ["②", "𝟐", "𝟚", "𝟤", "𝟮", "𝟸"],
+			"3": ["③", "𝟑", "𝟛", "𝟥", "𝟯", "𝟹"],
+			"4": ["④", "𝟒", "𝟜", "𝟦", "𝟰", "𝟺"],
+			"5": ["⑤", "𝟓", "𝟝", "𝟧", "𝟱", "𝟻"],
+			"6": ["⑥", "𝟔", "𝟞", "𝟨", "𝟲", "𝟼"],
+			"7": ["⑦", "𝟕", "𝟟", "𝟩", "𝟳", "𝟽"],
+			"8": ["⑧", "𝟖", "𝟠", "𝟪", "𝟴", "𝟾"],
+			"9": ["⑨", "𝟗", "𝟡", "𝟫", "𝟵", "𝟿"]
+        };
+
+        function obfuscate(event) {
+            event.preventDefault();  // This prevents the form from being submitted
+            var text = document.getElementById("textToObfuscate").value;
+            var obfuscatedText = "";
+            for (var i = 0; i < text.length; i++) {
+                var styles = style_mapping[text[i].toLowerCase()];
+                if (styles) {
+                    obfuscatedText += styles[Math.floor(Math.random() * styles.length)];
+                } else {
+                    obfuscatedText += text[i];
+                }
+            }
+            document.getElementById("obfuscatedText").innerText = obfuscatedText;
+        }
+    </script>
+</head>
+<body>
+    <form id="obfuscateForm" onsubmit="obfuscate(event)">
+        <input type="text" id="textToObfuscate" placeholder="Enter text to obfuscate">
+        <button type="submit">Obfuscate</button>
+        <div id="obfuscatedText"></div>
+    </form>
+</body>
+</html>
